@@ -1,0 +1,14 @@
+ReelsMachine - timings config
+symbols - disconnect for render shader, allow additional quad for symbols to allow offset and bounce. More polys and update, but much more flexible and still fast
+
+MAKE COMMON ALL TIMING...
+GSAP (blurgh!)
+SPINE - require hack into timekeeper?
+PIXI TICKER - make sure game uses one common one
+
+ENGINE TICKER - Engine should always be able to tick main logic, game logic separate!
+
+
+SYMBOL HOOK - hook on reels to add generic anything to cells
+
+WINLINE - cell highlights - normal, dark, on, pulsing
