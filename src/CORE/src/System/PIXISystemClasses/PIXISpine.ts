@@ -9,7 +9,10 @@ import { Spine } from 'pixi-spine';
 export class PIXISpine extends Spine {
 	constructor(_json: any) {
 		super(_json.spineData);
+
+		console.log('adding new spine - submodule test message');
 	}
+
 
 	public SetSkin(name: string) {
 		this.skeleton.setSkinByName(name);
