@@ -23,7 +23,7 @@
 	},
 	"version": "1.0.1",
 	"description": "",
-	"name": "engine submodule",
+	"name": "enginecoresubmodule",
 	"scripts": {
 		"build": "echo do not run tsc"
 	},
