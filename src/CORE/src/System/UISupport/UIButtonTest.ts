@@ -40,6 +40,7 @@ export class UIButtonTest extends PIXI.Container {
 	}
 
 	protected HandleClick = () => {
-		UISUPPORT.UIButtonSignal.emit(this.ID);
+		//UISUPPORT.UIButtonSignal.emit(this.ID);
+		UISUPPORT.UIButtonPressed(this.ID);
 	};
 }

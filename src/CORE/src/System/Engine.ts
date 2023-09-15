@@ -4,6 +4,7 @@
 
 import * as PIXI from 'pixi.js';
 
+import { PIXIReplacementApplication } from './PIXISystemClasses/PIXIReplacementApplication';
 import { PIXISystemRootContainer } from './PIXISystemClasses/PIXISystemRootContainer';
 import { PIXISystemDebugContainer } from './PIXISystemClasses/PIXISystemDebugContainer';
 import {
@@ -41,7 +42,7 @@ import { HeartBeat } from './Heartbeat/Heartbeat';
 
 import { MultiLanguageTranslation } from './MultiLanguageTranslation/MultiLanguageTranslation';
 
-export interface EngineParameters {
+export type EngineParameters = {
 	//Build target data
 
 	buildTargetConfig: any;
@@ -51,6 +52,10 @@ export interface EngineParameters {
 	initialWidth: number;
 	initialHeight: number;
 	UIStyle: PIXISYSTEMUI_STYLE;
+
+	//Render via engine
+
+	renderViaEngine: boolean;
 
 	//Screen pixel sizes
 	idealPixelWidth: number;
@@ -64,7 +69,7 @@ export interface EngineParameters {
 
 	//Slot machine
 	slotMachineConfig: SlotMachine_Config;
-}
+};
 
 /**
  * Core Graphics Engine based on top of THREE.js
@@ -75,7 +80,7 @@ class Engine {
 	protected stateHandler: StateMachine;
 
 	protected PIXIstage: PIXI.Container;
-	protected PIXIapp: PIXI.Application;
+	protected PIXIapp: PIXIReplacementApplication;
 	protected debugContainer: PIXISystemDebugContainer;
 	protected uiContainer: PIXISystemUIContainer;
 
@@ -125,8 +130,8 @@ class Engine {
 
 		//Initialise PIXI
 
-		this.PIXIapp = new PIXI.Application({
-			autoStart: true,
+		this.PIXIapp = new PIXIReplacementApplication({
+			autoStart: false,
 			resolution: 1,
 			antialias: true,
 			clearBeforeRender: true,
@@ -214,20 +219,6 @@ class Engine {
 		DEBUGSUPPORT = new DebugSupport(this.debugContainer);
 		UISUPPORT = new UISupport(this.uiContainer);
 
-		//Set up the heartbeat
-
-		HEARTBEAT = new HeartBeat(this.PIXIapp.ticker);
-
-		//Add the engine's heartbeat ticker
-
-		HEARTBEAT.Add(this.Tick, 'ENGINE');
-
-		//this.PIXIapp.ticker.add(this.Tick, this);
-
-		//Export a common ticker for others to attach
-
-		DISPLAYTICKER = this.PIXIapp.ticker; //TO BE SEPARATED!!!
-
 		//Set the 'next' stage
 
 		this.SetState(setup.startState);
@@ -242,6 +233,32 @@ class Engine {
 					PIXI: PIXI,
 				});
 		}
+
+		//Export a common ticker for others to attach
+
+		DISPLAYTICKER = this.PIXIapp.ticker; //TO BE SEPARATED!!!
+
+		//Set up the heartbeat
+
+		HEARTBEAT = new HeartBeat(this.PIXIapp.ticker);
+
+		//Add the engine's heartbeat ticker
+
+		HEARTBEAT.Add(this.Tick, 'ENGINE');
+
+		//Render via engine?
+
+		if (setup.renderViaEngine) {
+			this.PIXIapp.renderViaEngine = true;
+			HEARTBEAT.AddPostBeat(
+				this.PIXIapp.engineDrivenRender,
+				'ENGINE RENDER',
+			);
+		}
+
+		//Start time
+
+		this.PIXIapp.start();
 	}
 
 	public SetState(stageName: string) {
@@ -252,6 +269,10 @@ class Engine {
 		//Tick the sound manager
 
 		SOUNDMANAGER.Tick(delta, HEARTBEAT.timeNow);
+
+		//Pass any buttons down from the UI. Done here for consistent processing point
+
+		UISUPPORT.UIButtonPassDownFromEngine();
 
 		//Tick the state handler
 
@@ -270,6 +291,10 @@ class Engine {
 					's)',
 			);
 		}
+	};
+
+	protected EngineRender = () => {
+		this.PIXIapp.engineDrivenRender();
 	};
 
 	public GetRenderer(): PIXI.Renderer {

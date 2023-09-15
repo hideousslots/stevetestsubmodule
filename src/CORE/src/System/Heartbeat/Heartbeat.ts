@@ -18,6 +18,7 @@ class HeartBeat_Callback {
 
 export class HeartBeat {
 	protected callbacks: HeartBeat_Callback[] = [];
+	protected callbackspostbeat: HeartBeat_Callback[] = [];
 
 	//Running values to read
 
@@ -64,6 +65,30 @@ export class HeartBeat {
 		}
 	}
 
+	public AddPostBeat(
+		callback: (delta: number, now: number) => void,
+		ID: string,
+	) {
+		if (
+			this.callbackspostbeat.findIndex((existing) => {
+				return existing.callback === callback;
+			}) === -1
+		) {
+			this.callbackspostbeat.push(new HeartBeat_Callback(ID, callback));
+		}
+	}
+
+	public RemovePostBeat(callback: (delta: number, now: number) => void) {
+		let index;
+		if (
+			(index = this.callbackspostbeat.findIndex((existing) => {
+				return existing.callback === callback;
+			})) !== -1
+		) {
+			this.callbackspostbeat.splice(index, 1);
+		}
+	}
+
 	protected Tick(delta: number) {
 		//Count beats
 
@@ -76,6 +101,8 @@ export class HeartBeat {
 		this._msDelta = this.systemTicker.elapsedMS;
 		this._now = Date.now();
 
+		//Call all standard callbacks (e.g. logic)
+
 		this.callbacks.forEach((item) => {
 			//Can trace order here
 
@@ -84,6 +111,19 @@ export class HeartBeat {
 		});
 
 		//console.log('Heartbeat tick end ');
+
+		//console.log('Heartbeat postbeat start');
+
+		//Call all 'post beat' callbacks (e.g. render)
+
+		this.callbackspostbeat.forEach((item) => {
+			//Can trace order here
+
+			//console.log('Heartbeat tick -> ' + item.ID);
+			item.callback(this._msDelta, this._now);
+		});
+
+		//console.log('Heartbeat postbeat end ');
 	}
 
 	public Debug_GetRunOrder(): string[] {
