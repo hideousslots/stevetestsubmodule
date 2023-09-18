@@ -1,11 +1,11 @@
 //Export under CORE
 
-export * as CORE from './src/exports';
+export * as CORE from './moduleSrc/exports';
 
 //Some separate exports for convenience
 
-export { LOGGER } from './src/exports';
-export { PIXI } from './src/exports';
+export { LOGGER } from './moduleSrc/exports';
+export { PIXI } from './moduleSrc/exports';
 export {
 	Debug_LimitParams,
 	EngineParameters,
@@ -17,8 +17,8 @@ export {
 	SlotMachine_SpinData,
 	SlotMachine_SpinData_State,
 	SlotMachine_RoundData,
-} from './src/exports';
+} from './moduleSrc/exports';
 
 //Separate module simple test
 
-console.log('Engine2 core installed');
+console.log('Engine2 submodule "Engine2" installed as CORE@CORE');
