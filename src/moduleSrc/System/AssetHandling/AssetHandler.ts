@@ -149,14 +149,6 @@ export class AssetHandler {
 		});
 	}
 
-	public AddLoadSpineData(assetData: any[]) {
-		assetData.forEach((asset) => {
-			this.assetPool.push(
-				new AssetRecord(asset.name, asset.src, '', 'spinejson'),
-			);
-		});
-	}
-
 	public CommenceLoad() {
 		this.assetPool.forEach((asset) => {
 			if (!asset.loaded && !asset.loading) {
@@ -209,21 +201,13 @@ export class AssetHandler {
 					SOUNDMANAGER.LoadSoundItems(section.assets);
 				}
 			}
-			if (section.ID === 'TEXTURES') {
+			if (section.ID === 'RUNTIME') {
 				//Simple file load
 				if (
 					section.assets !== undefined &&
 					section.assets.length !== 0
 				) {
 					this.AddLoadData(section.assets);
-				}
-			}
-			if (section.ID === 'SPINES') {
-				if (
-					section.assets !== undefined &&
-					section.assets.length !== 0
-				) {
-					this.AddLoadSpineData(section.assets);
 				}
 			}
 		});
